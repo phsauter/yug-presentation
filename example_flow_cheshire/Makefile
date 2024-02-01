@@ -61,19 +61,35 @@ run-sv2v-only:
 # but look at the error messages, they are so nice!
 run-svase:
 	$(SVASE) example_soc simplified.sv pickled.sv
-	
+
+# there is still some cleanup necessary, this is a mix of SVase still needing some passes
+# and non-conforming RTL the commercial tools 'help you' with
 run-svase-fixed:
 	sed "s|default: return '{default: '{0, 0}};|default: return cva6_id_map_t'{default: '0};|g" pickled.sv > pickled_fixed.sv
 	sed -i "s|req_q <= (store_req_t'.*|req_q <= (store_req_t'{mode: axi_llc_pkg::tag_mode_e'(2'b0), default: '0});|g" pickled_fixed.sv
 	sed -i "s|module slib_mv_filter #(parameter WIDTH = 4, THRESHOLD = 10).*|module slib_mv_filter #(parameter WIDTH = 4, parameter THRESHOLD = 10) (|g" pickled_fixed.sv
 	$(SVASE) example_soc simplified.sv pickled_fixed.sv
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	sed -i 's/module example_soc__[[:digit:]]\+/module example_soc/' simplified.sv
+	sed -i "s|localparam int unsigned SlinkMaxClkDiv|///localparam int unsigned SlinkMaxClkDiv|g" simplified.sv
+
+# At this point we can generate an error that demonstrates why relying on sv2v alone is not feasible
+run-sv2v-error:
+	$(SV2V) --top example_soc simplified.sv --write final.v
+
+run-sv2v-final:
+	sed -i "s|RegOut.num_out|8'd14|g" simplified.sv
+	$(SV2V) --top example_soc simplified.sv --write final.v
+
+all:
+	$(MAKE) checkout
+	$(MAKE) chs-hw-all
+	$(MAKE) pickle
+	$(MAKE) run-svase-fixed
+	$(MAKE) run-sv2v-final
+
+
+clean:
+	rm morty.sv
+	rm pickled*.sv
+	rm simplified.sv
+	rm final.v
