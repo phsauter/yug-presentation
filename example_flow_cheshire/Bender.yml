@@ -1,0 +1,18 @@
+# Copyright 2023 ETH Zurich and University of Bologna.
+# Solderpad Hardware License, Version 0.51, see LICENSE for details.
+# SPDX-License-Identifier: SHL-0.51
+
+package:
+  name: example-soc
+  authors:
+    - "Philippe Sauter <phsauter@ethz.ch>"
+
+dependencies:
+  cheshire:           { git: https://github.com/pulp-platform/cheshire,                 rev:     ca073d1 }
+  # needed to configure cheshire (cheshire/typedef.svh uses the typedefs from these)
+  axi:                { git: "https://github.com/pulp-platform/axi.git",                version: 0.39.0  }
+  register_interface: { git: "https://github.com/pulp-platform/register_interface.git", version: 0.4.2   }
+
+sources:
+    files:
+      - example_soc.sv
