@@ -54,7 +54,7 @@ pickle: pickled.sv
 	python3 ./pragma.py pickled.sv > pickled_fixed_sv2v.sv
 
 # this will likely fail, note the error message
-run-sv2v-only:
+run-sv2v-only: pickle
 	$(SV2V) --top example_soc pickled_fixed_sv2v.sv --write sv2v.v
 	
 # this will also fail (a mix between questionable RTL and SVase being experimental)
